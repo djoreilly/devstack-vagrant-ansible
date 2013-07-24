@@ -3,7 +3,7 @@ devstack-vagrant-ansible
 
 Builds a new Ubuntu Raring (13.04) VM, installs git and clones devstack and copies a localrc. 
 
-Requirments
+Requirements
 -----------
 
 * Vagrant 1.2
