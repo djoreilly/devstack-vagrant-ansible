@@ -23,3 +23,11 @@ After it boots:
     vagrant ssh
     cd devstack
     ./stack.sh
+
+Notes
+-----
+Host 8080 is forwarded to guest port 80, so Horizon is on http://localhost:8080
+
+Set OFFLINE=true in localrc after first run.
+
+

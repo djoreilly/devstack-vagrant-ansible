@@ -2,20 +2,27 @@
 - name: provision a VM ready for devstack
   hosts: devstack
   user: vagrant
+  gather_facts: False
   tasks:
 
   - name: update packages
     sudo: True
     apt:  update_cache=yes
 
-  - name: install git
+  - name: install packages
     sudo: True
-    apt:  name=git
+    apt:  name={{ item }}
+    with_items:
+      - git
+      - python-mock
+      - python-tox
+
+  - command: git config --global color.ui true
 
   - name: clone devstack
     git:  repo=https://github.com/openstack-dev/devstack
-          dest=/home/vagrant/devstack
+          dest=/home/vagrant/devstack force=no
 
   - name: install localrc
-    copy: src=localrc dest=/home/vagrant/devstack/localrc
+    copy: src=localrc dest=/home/vagrant/devstack/localrc force=no
           owner=vagrant group=vagrant mode=0644

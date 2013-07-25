@@ -9,9 +9,11 @@ Vagrant.configure("2") do |config|
 
   config.vm.hostname = "devstack"
   config.vm.network :forwarded_port, guest: 80, host: 8080
+  config.vm.network :forwarded_port, guest: 6080, host: 6080 # vnc
 
   config.vm.provider "virtualbox" do |v|
-    v.customize ["modifyvm", :id, "--memory", "2048"]
+    v.customize ["modifyvm", :id, "--memory", "2500"]
+    v.customize ["modifyvm", :id, "--uart1", "0x3F8", 4]
   end
 
   config.vm.provision :ansible do |ansible|
