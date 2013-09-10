@@ -3,6 +3,8 @@
   hosts: devstack
   user: vagrant
   gather_facts: False
+  vars:
+    - mangle: openstack@yahoo
   tasks:
 
   - name: update packages
@@ -14,12 +16,19 @@
     apt:  name={{ item }}
     with_items:
       - git
+      - git-review
       - python-mock
       - python-tox
+      - language-pack-en-base
+
+    # http://askubuntu.com/a/17002
+  - command: dpkg-reconfigure locales
+             creates=/home/vagrant/.reconfigure-locale-done
+    sudo: True
 
   - command: git config --global color.ui true
   - command: git config --global user.name "Darragh O'Reilly"
-  - command: git config --global user.email dara2002-openstack@yahoo.com
+  - command: git config --global user.email dara2002-{{ mangle }}.com
 
   - name: clone devstack
     git:  repo=https://github.com/openstack-dev/devstack
