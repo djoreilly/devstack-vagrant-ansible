@@ -17,8 +17,7 @@
     with_items:
       - git
       - git-review
-      - python-mock
-      - python-tox
+      - python-pip
       - language-pack-en-base
 
     # http://askubuntu.com/a/17002
@@ -29,6 +28,14 @@
   - command: git config --global color.ui true
   - command: git config --global user.name "Darragh O'Reilly"
   - command: git config --global user.email dara2002-{{ mangle }}.com
+
+  - name: install pips
+    sudo: True
+    pip:  name={{ item }}
+    with_items:
+      - mock
+      - tox
+      - virtualenv
 
   - name: clone devstack
     git:  repo=https://github.com/openstack-dev/devstack
