@@ -1,46 +1,64 @@
 ---
-- name: provision a VM ready for devstack
+- name: Configure a VirtualBox VM for devstack
   hosts: devstack
   user: vagrant
+  sudo: True
   gather_facts: False
-  vars:
-    - mangle: openstack@yahoo
   tasks:
 
-  - name: update packages
-    sudo: True
-    apt:  update_cache=yes
+  - apt: update_cache=yes
 
   - name: install packages
-    sudo: True
     apt:  name={{ item }}
     with_items:
       - git
       - git-review
       - python-pip
-      - language-pack-en-base
+      - ipython
+      - htop
+      - nfs-kernel-server
+      - libmysqlclient-dev
+      - libxml2-dev
+      - libxslt1-dev
 
-    # http://askubuntu.com/a/17002
-  - command: dpkg-reconfigure locales
-             creates=/home/vagrant/.reconfigure-locale-done
-    sudo: True
+  - file: dest=/opt/stack state=directory owner=vagrant group=root mode=0755
 
-  - command: git config --global color.ui true
-  - command: git config --global user.name "Darragh O'Reilly"
-  - command: git config --global user.email dara2002-{{ mangle }}.com
+  - lineinfile: dest=/etc/exports regexp='^\/opt\/stack'
+                line='/opt/stack    *(rw,sync,no_root_squash)'
+    notify: restart nfs
 
   - name: install pips
-    sudo: True
     pip:  name={{ item }}
     with_items:
       - mock
-      - tox
       - virtualenv
+      - nose
+      - rednose
+
+    # https://bugs.launchpad.net/openstack-ci/+bug/1274135
+  - pip: name=tox version=1.6.1
+
+  - lineinfile: dest=/home/vagrant/.bashrc regexp='^export NOSE_REDNOSE'
+                line='export NOSE_REDNOSE=1'
 
   - name: clone devstack
     git:  repo=https://github.com/openstack-dev/devstack
           dest=/home/vagrant/devstack force=no update=no
+    sudo: False
 
-  - name: install localrc
-    copy: src=localrc dest=/home/vagrant/devstack/localrc force=no
-          owner=vagrant group=vagrant mode=0644
+  - name: copy localrc
+    copy: src=localrc dest=/home/vagrant/devstack/localrc
+          force=no owner=vagrant group=vagrant mode=0644
+
+  - git: repo=https://github.com/openstack-infra/os-loganalyze
+         dest=/opt/stack/os-loganalyze force=no update=no
+    sudo: False
+
+  - copy: src=rc.local dest=/etc/rc.local mode=0755
+  - command: /etc/rc.local
+
+  handlers:
+  - name: restart nfs
+    action: service name=nfs-kernel-server state=restarted
+    sudo: True
+

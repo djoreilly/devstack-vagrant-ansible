@@ -1,0 +1,12 @@
+#!/bin/bash
+set -e
+
+source /home/vagrant/devstack/openrc
+
+set -x
+
+ext_id_11=`neutron net-list -c id -f csv --quote none --name=public | tail -1 | cut -c1-11`
+ext_br="brq"$ext_id_11
+
+sudo ip address add 172.24.4.1/24 dev $ext_br
+
