@@ -14,7 +14,7 @@
 ip link set dev eth2 up
 ip link set dev eth3 up
 
-htmlify-server.py 1>>/opt/stack/logs/screen/os-loganalyze.log 2>&1 &
+/usr/local/bin/htmlify-server.py 1>/opt/stack/logs/screen/os-loganalyze.log 2>&1 &
 
 exit 0
 
