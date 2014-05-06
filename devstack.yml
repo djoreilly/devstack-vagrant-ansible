@@ -20,6 +20,7 @@
       - libmysqlclient-dev
       - libxml2-dev
       - libxslt1-dev
+      - gettext
 
   - file: dest=/opt/stack state=directory owner=vagrant group=root mode=0755
 
